@@ -1,4 +1,5 @@
 PODS:
+  - Alamofire (4.8.2)
   - CryptoSwift (0.15.0)
   - PusherSwift (7.0.0):
     - CryptoSwift (~> 0.9)
@@ -9,11 +10,13 @@ PODS:
   - SwiftySound (1.1.0)
 
 DEPENDENCIES:
+  - Alamofire
   - PusherSwift (~> 7.0)
   - SwiftySound
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
+    - Alamofire
     - CryptoSwift
     - PusherSwift
     - ReachabilitySwift
@@ -21,12 +24,13 @@ SPEC REPOS:
     - SwiftySound
 
 SPEC CHECKSUMS:
+  Alamofire: ae5c501addb7afdbb13687d7f2f722c78734c2d3
   CryptoSwift: 769f58a9e89f64e8796c2e59ce5f002dc81a2438
   PusherSwift: d15d6290be0b0b57fd9ac80b03661a6ba24623ec
   ReachabilitySwift: 408477d1b6ed9779dba301953171e017c31241f3
   Starscream: ef3ece99d765eeccb67de105bfa143f929026cf5
   SwiftySound: eb46cc2399cf7d94f58c372f38216e15e0a6de3e
 
-PODFILE CHECKSUM: 01604d8628521a6507021446a77c9b72fb4a2117
+PODFILE CHECKSUM: 8f31c83eb842f4d18f725f37688f031cbb5b7076
 
 COCOAPODS: 1.5.3
