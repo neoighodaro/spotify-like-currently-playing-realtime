@@ -69,7 +69,7 @@ class PlaylistTableViewController: UITableViewController {
     
     fileprivate func populateTracks() {
         tracks.append(
-            Song(id: 1, title: "Sample", cover: "https://via.placeholder.com/500x500", duration: 195, artist: "Neo")
+            Song(id: 1, title: "Sample", cover: "https://via.placeholder.com/500x500", duration: 195, artist: "Neo", isPlaying: false)
         )
     }
     
