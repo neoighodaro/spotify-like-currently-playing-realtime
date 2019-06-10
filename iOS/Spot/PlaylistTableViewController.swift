@@ -37,6 +37,12 @@ class PlaylistTableViewController: UITableViewController {
         navigationController?.navigationBar.prefersLargeTitles = true
     }
     
+    fileprivate func populateTracks() {
+        tracks.append(
+            Song(id: 1, title: "Sample", cover: "https://via.placeholder.com/500x500", duration: 195, artist: "Neo", isPlaying: false)
+        )
+    }
+    
     // MARK: - Sound controls
     
     fileprivate func prepareSound() {
@@ -65,12 +71,6 @@ class PlaylistTableViewController: UITableViewController {
     
     fileprivate func resumeSound() {
         sound.resume()
-    }
-    
-    fileprivate func populateTracks() {
-        tracks.append(
-            Song(id: 1, title: "Sample", cover: "https://via.placeholder.com/500x500", duration: 195, artist: "Neo", isPlaying: false)
-        )
     }
     
     // MARK: - Timer
