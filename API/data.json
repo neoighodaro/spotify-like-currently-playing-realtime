@@ -1,0 +1,25 @@
+{
+  "data": [
+    {
+      "id": 1,
+      "duration": 195,
+      "artiste": "JugHead",
+      "title": "Polly",
+      "cover": "https://via.placeholder.com/500x500"
+    },
+    {
+      "id": 2,
+      "duration": 195,
+      "artiste": "Archie",
+      "title": "Veronica",
+      "cover": "https://via.placeholder.com/500x500"
+    },
+    {
+      "id": 3,
+      "duration": 195,
+      "artiste": "Reggie",
+      "title": "Rockstone",
+      "cover": "https://via.placeholder.com/500x500"
+    }
+  ]
+}
