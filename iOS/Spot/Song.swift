@@ -14,5 +14,5 @@ struct Song: Codable {
     let cover: String
     let duration: Int
     let artist: String
-    var isPlaying: Bool
+    var isPlaying: Bool = false
 }

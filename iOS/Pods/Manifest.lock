@@ -10,9 +10,9 @@ PODS:
   - SwiftySound (1.1.0)
 
 DEPENDENCIES:
-  - Alamofire
+  - Alamofire (~> 4.8.2)
   - PusherSwift (~> 7.0)
-  - SwiftySound
+  - SwiftySound (~> 1.1.0)
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
@@ -31,6 +31,6 @@ SPEC CHECKSUMS:
   Starscream: ef3ece99d765eeccb67de105bfa143f929026cf5
   SwiftySound: eb46cc2399cf7d94f58c372f38216e15e0a6de3e
 
-PODFILE CHECKSUM: 8f31c83eb842f4d18f725f37688f031cbb5b7076
+PODFILE CHECKSUM: e708b6f96c81084916d9ea14b6426c5486c604d3
 
 COCOAPODS: 1.5.3
