@@ -94,7 +94,6 @@ class PlaylistTableViewController: UITableViewController {
     
     fileprivate func handleCurrentEvent(data: [String: Any]) {
         guard data["device"] as? String != deviceName else { return }
-        print(data)
     }
     
     // MARK: - Sound controls
