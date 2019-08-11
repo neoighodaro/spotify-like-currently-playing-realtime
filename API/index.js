@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const Pusher = require('pusher-js');
+const Pusher = require('pusher');
 const fs = require('fs');
 const path = require('path');
 const app = express();
@@ -13,21 +13,22 @@ let pusher = new Pusher({
   key: 'e869e6bdd555fab59a98',
   secret: '339363077939b0557d76',
   cluster: 'mt1',
-  encrypted: true
+  useTLS: true
 });
+
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get('/tracks', (req, res) => res.json(tracks));
 app.get('/current', (req, res) => res.json(current));
 
-app.post('tick', (req, res) => {
+app.post('/tick', (req, res) => {
   const { id, position, device } = req.body;
 
-  for (let index = 0; index < tracks.data.length; index++) {
-    if (tracks['data'][index]['id'] === parseInt(id)) {
-      current = tracks['data'][index];
-      pusher.trigger('spot', 'tick', { id, position, device });
-      res.json({ status: true });
-      break;
+  for (let index = 0; index < tracks.length; index++) {
+    if (tracks[index]['id'] === parseInt(id)) {
+      current = tracks[index];
+      pusher.trigger('spotmusic', 'tick', { id, position, device });
+      return res.json({ status: true });
     }
   }
 
