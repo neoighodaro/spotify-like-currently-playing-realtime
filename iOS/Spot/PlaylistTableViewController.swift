@@ -7,7 +7,9 @@
 //
 
 import UIKit
+import Alamofire
 import SwiftySound
+import PusherSwift
 
 class Duration {
     var count = 0
@@ -26,21 +28,73 @@ class PlaylistTableViewController: UITableViewController {
     var duration = 0
     var timer: Timer?
     var timerStarted = false
+    
+    var pusher: Pusher!
+
+    let deviceName = "iPhone"
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         populateTracks()
         prepareSound()
+        pusherConnect()
         
         navigationItem.title = "Music"
         navigationController?.navigationBar.prefersLargeTitles = true
     }
     
     fileprivate func populateTracks() {
-        tracks.append(
-            Song(id: 1, title: "Sample", cover: "https://via.placeholder.com/500x500", duration: 195, artist: "Neo", isPlaying: false)
-        )
+        Alamofire.request("http://localhost:3000/tracks").validate().responseData { res in
+            guard res.result.isSuccess, let responseData = res.data else {
+                return print("Failed to fetch data from the server")
+            }
+            
+            let decoder = JSONDecoder()
+            self.tracks = try! decoder.decode([Song].self, from: responseData)
+            self.tableView.reloadData()
+        }
+    }
+    
+    // MARK: - Realtime
+
+    fileprivate func pusherConnect() {
+        pusher = Pusher(key: "e869e6bdd555fab59a98", options: PusherClientOptions(
+            host: .cluster("mt1")
+        ))
+        pusher.connect()
+        
+        let channel = pusher.subscribe("spotmusic")
+        
+        let _ = channel.bind(eventName: "tick") { [unowned self] data in
+            if let data = data as? [String: String] {
+                self.handleTickEvent(data: data)
+            }
+        }
+        
+        let _ = channel.bind(eventName: "current") { [unowned self] data in
+            if let data = data as? [String: Any] {
+                self.handleCurrentEvent(data: data)
+            }
+        }
+    }
+    
+    fileprivate func handleTickEvent(data: [String: String]) {
+        guard data["device"] != deviceName else { return }
+        guard let intent = data["intent"] else { return }
+        
+        switch intent {
+        case "pause":
+            pauseSound() // pause timer
+        case "resume":
+            resumeSound() // resume timer
+        default: break
+        }
+    }
+    
+    fileprivate func handleCurrentEvent(data: [String: Any]) {
+        guard data["device"] as? String != deviceName else { return }
+        print(data)
     }
     
     // MARK: - Sound controls
@@ -113,7 +167,8 @@ class PlaylistTableViewController: UITableViewController {
         let track = tracks[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: "track", for: indexPath)
 
-        cell.textLabel?.text = "🎶 \(track.title) - \(track.artist)"
+        let isPlaying = track.isPlaying ?? false
+        cell.textLabel?.text = "\(isPlaying ? "🎶" : "") \(track.title) - \(track.artist)"
 
         return cell
     }
@@ -126,6 +181,13 @@ class PlaylistTableViewController: UITableViewController {
         }
         
         if sound.playing == false || currentlyPlaying == nil || currentlyPlaying?.id != lastPlayed?.id {
+            if let index = tracks.firstIndex(where: { $0.id == currentlyPlaying?.id }) {
+                tracks[index].isPlaying = false
+            }
+
+            tracks[indexPath.row].isPlaying = true
+            self.tableView.reloadData()
+            
             lastPlayed = currentlyPlaying
             currentlyPlaying = tracks[indexPath.row]
             
