@@ -67,35 +67,21 @@ class PlaylistTableViewController: UITableViewController {
         let channel = pusher.subscribe("spotmusic")
         
         let _ = channel.bind(eventName: "tick") { [unowned self] data in
-            if let data = data as? [String: String] {
+            if let data = data as? [String: Any] {
                 self.handleTickEvent(data: data)
             }
         }
+    }
+    
+    fileprivate func handleTickEvent(data: [String: Any]) {
+        guard let device = data["device"] as? String, device != deviceName else { return }
+        guard let position = data["position"] as? Int else { return }
         
-        let _ = channel.bind(eventName: "current") { [unowned self] data in
-            if let data = data as? [String: Any] {
-                self.handleCurrentEvent(data: data)
-            }
-        }
+        setTimer(count: position)
+        startTimer()
+        pauseSound()
     }
-    
-    fileprivate func handleTickEvent(data: [String: String]) {
-        guard data["device"] != deviceName else { return }
-        guard let intent = data["intent"] else { return }
-        
-        switch intent {
-        case "pause":
-            pauseSound() // pause timer
-        case "resume":
-            resumeSound() // resume timer
-        default: break
-        }
-    }
-    
-    fileprivate func handleCurrentEvent(data: [String: Any]) {
-        guard data["device"] as? String != deviceName else { return }
-    }
-    
+
     // MARK: - Sound controls
     
     fileprivate func prepareSound() {
@@ -135,10 +121,24 @@ class PlaylistTableViewController: UITableViewController {
     }
     
     @objc fileprivate func tickTimer() {
+        if Duration.instance.freeze {
+            return
+        }
+
         Duration.instance.count += 1
         
         if Duration.instance.count > 1000 {
             killTimer()
+        } else {
+            let params: Parameters = [
+                "device": deviceName,
+                "id": currentlyPlaying?.id ?? 0,
+                "position": Duration.instance.count,
+            ]
+
+            Alamofire.request("http://localhost:3000/tick", method: .post, parameters: params)
+                .validate()
+                .responseData { _ in }
         }
     }
     
