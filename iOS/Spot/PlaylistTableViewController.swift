@@ -120,6 +120,10 @@ class PlaylistTableViewController: UITableViewController {
         }
     }
     
+    fileprivate func setTimer(count: Int) {
+        Duration.instance.count = count
+    }
+    
     @objc fileprivate func tickTimer() {
         if Duration.instance.freeze {
             return
