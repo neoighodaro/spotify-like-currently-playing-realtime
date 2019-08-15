@@ -54,6 +54,10 @@ $(function() {
       trackTime.addClass('active');
     }
 
+    if (Math.floor(audio.currentTime - curMinutes * 60) > curSeconds) {
+      console.log(parseInt(curSeconds)); // realtime here
+    }
+
     curMinutes = Math.floor(audio.currentTime / 60);
     curSeconds = Math.floor(audio.currentTime - curMinutes * 60);
 
