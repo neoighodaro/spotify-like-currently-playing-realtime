@@ -26,6 +26,15 @@ $(function() {
     trackUrl = ['/jingle.mp3'],
     currIndex = -1;
 
+  const socket = new Pusher('PUSHER_KEY', { cluster: 'PUSHER_CLUSTER' });
+  const channel = socket.subscribe('spotmusic');
+
+  channel.bind('tick', data => {
+    if (data.device !== 'web') {
+      console.log('Do something with ', data);
+    }
+  });
+
   function playPause() {
     setTimeout(function() {
       if (audio.paused) {
@@ -55,7 +64,11 @@ $(function() {
     }
 
     if (Math.floor(audio.currentTime - curMinutes * 60) > curSeconds) {
-      console.log(parseInt(curSeconds)); // realtime here
+      axios.post('http://localhost:3000/tick', {
+        device: 'web',
+        id: currIndex + 1,
+        position: curSeconds
+      });
     }
 
     curMinutes = Math.floor(audio.currentTime / 60);
