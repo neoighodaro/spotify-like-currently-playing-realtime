@@ -1,0 +1,9 @@
+source 'https://github.com/CocoaPods/Specs.git'
+platform :ios, '12.0'
+
+target 'Spot' do
+  use_frameworks!
+  pod 'PusherSwift', '~> 7.0'
+  pod 'SwiftySound', '~> 1.1.0'
+  pod 'Alamofire', '~> 4.8.2'
+end

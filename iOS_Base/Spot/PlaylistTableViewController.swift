@@ -7,9 +7,7 @@
 //
 
 import UIKit
-import Alamofire
 import SwiftySound
-import PusherSwift
 
 class Duration {
     var count = 0
@@ -30,8 +28,6 @@ class PlaylistTableViewController: UITableViewController {
     var timer: Timer?
     var timerStarted = false
     
-    var pusher: Pusher!
-
     let deviceName = "iPhone"
     var playingDevice: String?
 
@@ -40,60 +36,17 @@ class PlaylistTableViewController: UITableViewController {
 
         populateTracks()
         prepareSound()
-        pusherConnect()
         
         navigationItem.title = "Music"
         navigationController?.navigationBar.prefersLargeTitles = true
     }
     
     fileprivate func populateTracks() {
-        Alamofire.request("http://localhost:3000/tracks").validate().responseData { res in
-            guard res.result.isSuccess, let responseData = res.data else {
-                return print("Failed to fetch data from the server")
-            }
-            
-            let decoder = JSONDecoder()
-            self.tracks = try! decoder.decode([Song].self, from: responseData)
-            self.tableView.reloadData()
-        }
+        tracks.append(
+            Song(id: 1, title: "Sample", cover: "https://via.placeholder.com/500x500", duration: 195, artist: "Neo", isPlaying: false)
+        )
     }
     
-    // MARK: - Realtime
-
-    fileprivate func pusherConnect() {
-        pusher = Pusher(key: "e869e6bdd555fab59a98", options: PusherClientOptions(
-            host: .cluster("mt1")
-        ))
-        pusher.connect()
-        
-        let channel = pusher.subscribe("spotmusic")
-        
-        let _ = channel.bind(eventName: "tick") { [unowned self] data in
-            if let data = data as? [String: Any] {
-                self.handleTickEvent(data: data)
-            }
-        }
-    }
-    
-    fileprivate func handleTickEvent(data: [String: Any]) {
-        guard let device = data["device"] as? String, device != deviceName else {
-            playingDevice = deviceName
-            return
-        }
-        
-        guard let position = data["position"] as? Int else { return }
-        
-        if playingDevice == deviceName {
-            killTimer()
-        }
-        
-        playingDevice = device
-        
-        setTimer(count: position)
-        startTimer()
-        pauseSound()
-    }
-
     // MARK: - Sound controls
     
     fileprivate func prepareSound() {
@@ -150,18 +103,6 @@ class PlaylistTableViewController: UITableViewController {
         if Duration.instance.count > 1000 {
             killTimer()
         }
-        
-        else if (playingDevice == deviceName) {
-            let params: Parameters = [
-                "device": deviceName,
-                "id": currentlyPlaying?.id ?? 0,
-                "position": Duration.instance.count,
-            ]
-
-            Alamofire.request("http://localhost:3000/tick", method: .post, parameters: params)
-                .validate()
-                .responseData { _ in }
-        }
     }
     
     fileprivate func resetTimer() {
@@ -188,8 +129,7 @@ class PlaylistTableViewController: UITableViewController {
         let track = tracks[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: "track", for: indexPath)
 
-        let isPlaying = track.isPlaying ?? false
-        cell.textLabel?.text = "\(isPlaying ? "🎶" : "") \(track.title) - \(track.artist)"
+        cell.textLabel?.text = "🎶 \(track.title) - \(track.artist)"
 
         return cell
     }
@@ -202,21 +142,11 @@ class PlaylistTableViewController: UITableViewController {
         }
         
         if sound.playing == false || currentlyPlaying == nil || currentlyPlaying?.id != lastPlayed?.id {
-            if let index = tracks.firstIndex(where: { $0.id == currentlyPlaying?.id }) {
-                tracks[index].isPlaying = false
-            }
-
-            tracks[indexPath.row].isPlaying = true
-            self.tableView.reloadData()
-            
             lastPlayed = currentlyPlaying
             currentlyPlaying = tracks[indexPath.row]
             
-            if playingDevice == nil || playingDevice == deviceName {
-                playingDevice = deviceName
-                playSound()
-                resetTimer()
-            }
+            playSound()
+            resetTimer()
             
             if timerStarted == false {
                 timer?.fire()
