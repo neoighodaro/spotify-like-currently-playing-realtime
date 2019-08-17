@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const Pusher = require('pusher');
 const fs = require('fs');
+const cors = require('cors');
 const path = require('path');
 const app = express();
 
@@ -16,12 +17,14 @@ let pusher = new Pusher({
   useTLS: true
 });
 
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get('/tracks', (req, res) => res.json(tracks));
 app.get('/current', (req, res) => res.json(current));
 
-app.post('/tick', (req, res) => {
+app.options('/tick', cors());
+app.post('/tick', cors(), (req, res) => {
   const { id, position, device } = req.body;
 
   for (let index = 0; index < tracks.length; index++) {
