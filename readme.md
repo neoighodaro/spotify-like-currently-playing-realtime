@@ -2,6 +2,10 @@
 
 This app just showcases how to use Pusher's realtime features to track play position on two music players.
 
+https://pusher.com/tutorials/spotify-currently-playing-ios-part-1
+https://pusher.com/tutorials/spotify-currently-playing-ios-part-2
+https://pusher.com/tutorials/spotify-currently-playing-ios-part-3
+
 ### Prerequisites
 
 You need the following requirements:
